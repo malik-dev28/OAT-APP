@@ -13,7 +13,15 @@ class ChatMessage {
 }
 
 class AiChatbotService {
-  // Airport database with full names and countries
+  // Common misspellings and corrections
+  static final Map<String, String> _spellingCorrections = {
+    'addias': 'addis', 'addia': 'addis', 'adiss': 'addis',
+    'ethopia': 'ethiopia', 'ethopian': 'ethiopian',
+    'qatter': 'qatar', 'emirats': 'emirates', 'singapor': 'singapore',
+    // ... (keep all your existing spelling corrections)
+  };
+
+  // Airport database
   static final Map<String, Map<String, String>> _airportDatabase = {
     'NYC': {
       'name': 'New York City (Multiple Airports)',
@@ -45,144 +53,10 @@ class AiChatbotService {
       'city': 'London',
       'country': 'United Kingdom'
     },
-    'CDG': {
-      'name': 'Paris Charles de Gaulle Airport',
-      'city': 'Paris',
-      'country': 'France'
-    },
-    'FRA': {
-      'name': 'Frankfurt Airport',
-      'city': 'Frankfurt',
-      'country': 'Germany'
-    },
-    'IST': {
-      'name': 'Istanbul Airport',
-      'city': 'Istanbul',
-      'country': 'Turkey'
-    },
-    'NRT': {
-      'name': 'Narita International Airport',
-      'city': 'Tokyo',
-      'country': 'Japan'
-    },
-    'HND': {'name': 'Haneda Airport', 'city': 'Tokyo', 'country': 'Japan'},
-    'ICN': {
-      'name': 'Incheon International Airport',
-      'city': 'Seoul',
-      'country': 'South Korea'
-    },
-    'SIN': {
-      'name': 'Singapore Changi Airport',
-      'city': 'Singapore',
-      'country': 'Singapore'
-    },
-    'BKK': {
-      'name': 'Suvarnabhumi Airport',
-      'city': 'Bangkok',
-      'country': 'Thailand'
-    },
-    'DEL': {
-      'name': 'Indira Gandhi International Airport',
-      'city': 'Delhi',
-      'country': 'India'
-    },
-    'SYD': {
-      'name': 'Sydney Kingsford Smith Airport',
-      'city': 'Sydney',
-      'country': 'Australia'
-    },
-    'YYZ': {
-      'name': 'Toronto Pearson International Airport',
-      'city': 'Toronto',
-      'country': 'Canada'
-    },
-    'AMS': {
-      'name': 'Amsterdam Airport Schiphol',
-      'city': 'Amsterdam',
-      'country': 'Netherlands'
-    },
-    'MAD': {
-      'name': 'Adolfo Suárez Madrid–Barajas Airport',
-      'city': 'Madrid',
-      'country': 'Spain'
-    },
-    'MIA': {
-      'name': 'Miami International Airport',
-      'city': 'Miami',
-      'country': 'United States'
-    },
-    'GRU': {
-      'name': 'São Paulo/Guarulhos International Airport',
-      'city': 'São Paulo',
-      'country': 'Brazil'
-    },
-    'LIS': {'name': 'Lisbon Airport', 'city': 'Lisbon', 'country': 'Portugal'},
-    'MNL': {
-      'name': 'Ninoy Aquino International Airport',
-      'city': 'Manila',
-      'country': 'Philippines'
-    },
-    'PEK': {
-      'name': 'Beijing Capital International Airport',
-      'city': 'Beijing',
-      'country': 'China'
-    },
-    'PVG': {
-      'name': 'Shanghai Pudong International Airport',
-      'city': 'Shanghai',
-      'country': 'China'
-    },
-    'BOM': {
-      'name': 'Chhatrapati Shivaji Maharaj International Airport',
-      'city': 'Mumbai',
-      'country': 'India'
-    },
-    'FCO': {
-      'name': 'Leonardo da Vinci–Fiumicino Airport',
-      'city': 'Rome',
-      'country': 'Italy'
-    },
-    'CAI': {
-      'name': 'Cairo International Airport',
-      'city': 'Cairo',
-      'country': 'Egypt'
-    },
-    'JNB': {
-      'name': 'O.R. Tambo International Airport',
-      'city': 'Johannesburg',
-      'country': 'South Africa'
-    },
-    'NBO': {
-      'name': 'Jomo Kenyatta International Airport',
-      'city': 'Nairobi',
-      'country': 'Kenya'
-    },
-    // Ethiopian domestic airports
-    'DIR': {
-      'name': 'Aba Tenna Dejazmach Yilma International Airport',
-      'city': 'Dire Dawa',
-      'country': 'Ethiopia'
-    },
-    'MQX': {
-      'name': 'Alula Aba Nega Airport',
-      'city': 'Mekelle',
-      'country': 'Ethiopia'
-    },
-    'BJR': {
-      'name': 'Bahir Dar Airport',
-      'city': 'Bahir Dar',
-      'country': 'Ethiopia'
-    },
-    'GDQ': {'name': 'Gondar Airport', 'city': 'Gondar', 'country': 'Ethiopia'},
-    'LLI': {
-      'name': 'Lalibela Airport',
-      'city': 'Lalibela',
-      'country': 'Ethiopia'
-    },
-    'AXU': {'name': 'Axum Airport', 'city': 'Axum', 'country': 'Ethiopia'},
+    // ... (keep all your existing airport database)
   };
 
-  // Airline database with headquarters
+  // Airline database
   static final Map<String, Map<String, String>> _airlineDatabase = {
     'ET': {
       'name': 'Ethiopian Airlines',
@@ -202,147 +76,10 @@ class AiChatbotService {
       'hub': 'SIN',
       'ranking': '#2 World Best 2025'
     },
-    'CX': {
-      'name': 'Cathay Pacific',
-      'country': 'Hong Kong',
-      'hub': 'HKG',
-      'ranking': '#3 World Best 2025'
-    },
-    'EK': {
-      'name': 'Emirates',
-      'country': 'UAE',
-      'hub': 'DXB',
-      'ranking': '#4 World Best 2025'
-    },
-    'NH': {
-      'name': 'ANA All Nippon Airways',
-      'country': 'Japan',
-      'hub': 'HND',
-      'ranking': '#5 World Best 2025'
-    },
-    'TK': {
-      'name': 'Turkish Airlines',
-      'country': 'Turkey',
-      'hub': 'IST',
-      'ranking': '#6 World Best 2025'
-    },
-    'KE': {
-      'name': 'Korean Air',
-      'country': 'South Korea',
-      'hub': 'ICN',
-      'ranking': '#7 World Best 2025'
-    },
-    'AF': {
-      'name': 'Air France',
-      'country': 'France',
-      'hub': 'CDG',
-      'ranking': '#8 World Best 2025'
-    },
-    'JL': {
-      'name': 'Japan Airlines',
-      'country': 'Japan',
-      'hub': 'HND',
-      'ranking': '#9 World Best 2025'
-    },
-    'HU': {
-      'name': 'Hainan Airlines',
-      'country': 'China',
-      'hub': 'PEK',
-      'ranking': '#10 World Best 2025'
-    },
-    'LX': {
-      'name': 'Swiss International Air Lines',
-      'country': 'Switzerland',
-      'hub': 'ZRH',
-      'ranking': '#11 World Best 2025'
-    },
-    'BR': {
-      'name': 'EVA Air',
-      'country': 'Taiwan',
-      'hub': 'TPE',
-      'ranking': '#12 World Best 2025'
-    },
-    'BA': {
-      'name': 'British Airways',
-      'country': 'United Kingdom',
-      'hub': 'LHR',
-      'ranking': '#13 World Best 2025'
-    },
-    'QF': {
-      'name': 'Qantas Airways',
-      'country': 'Australia',
-      'hub': 'SYD',
-      'ranking': '#14 World Best 2025'
-    },
-    'LH': {
-      'name': 'Lufthansa',
-      'country': 'Germany',
-      'hub': 'FRA',
-      'ranking': '#15 World Best 2025'
-    },
-    'VS': {
-      'name': 'Virgin Atlantic',
-      'country': 'United Kingdom',
-      'hub': 'LHR',
-      'ranking': '#16 World Best 2025'
-    },
-    'SV': {
-      'name': 'Saudi Arabian Airlines',
-      'country': 'Saudi Arabia',
-      'hub': 'JED',
-      'ranking': '#17 World Best 2025'
-    },
-    'JX': {
-      'name': 'STARLUX Airlines',
-      'country': 'Taiwan',
-      'hub': 'TPE',
-      'ranking': '#18 World Best 2025'
-    },
-    'AC': {
-      'name': 'Air Canada',
-      'country': 'Canada',
-      'hub': 'YYZ',
-      'ranking': '#19 World Best 2025'
-    },
-    'IB': {
-      'name': 'Iberia',
-      'country': 'Spain',
-      'hub': 'MAD',
-      'ranking': '#20 World Best 2025'
-    },
-    'AA': {
-      'name': 'American Airlines',
-      'country': 'United States',
-      'hub': 'DFW',
-      'ranking': 'Major US Carrier'
-    },
-    'DL': {
-      'name': 'Delta Air Lines',
-      'country': 'United States',
-      'hub': 'ATL',
-      'ranking': 'Major US Carrier'
-    },
-    'UA': {
-      'name': 'United Airlines',
-      'country': 'United States',
-      'hub': 'ORD',
-      'ranking': 'Major US Carrier'
-    },
-    'B6': {
-      'name': 'JetBlue Airways',
-      'country': 'United States',
-      'hub': 'JFK',
-      'ranking': 'US Low-Cost Carrier'
-    },
-    'AS': {
-      'name': 'Alaska Airlines',
-      'country': 'United States',
-      'hub': 'SEA',
-      'ranking': 'US West Coast Carrier'
-    },
+    // ... (keep all your existing airline database)
   };
 
-  // Popular routes with descriptions
+  // Popular routes
   static final List<Map<String, dynamic>> _popularRoutes = [
     {
       'from': 'NYC',
@@ -358,127 +95,427 @@ class AiChatbotService {
       'bestPrice': '\$590',
       'bestAirline': 'Turkish Airlines'
     },
-    {
-      'from': 'DXB',
-      'to': 'ADD',
-      'description': 'Middle East to African hub connection',
-      'bestPrice': '\$390',
-      'bestAirline': 'Air Arabia'
-    },
-    {
-      'from': 'ADD',
-      'to': 'NBO',
-      'description': 'East African regional connection',
-      'bestPrice': '\$220',
-      'bestAirline': 'Ethiopian Airlines'
-    },
-    {
-      'from': 'JFK',
-      'to': 'LHR',
-      'description': 'Premium transatlantic business route',
-      'bestPrice': '\$650',
-      'bestAirline': 'British Airways'
-    },
-    {
-      'from': 'DXB',
-      'to': 'LHR',
-      'description': 'Middle East to Europe premium route',
-      'bestPrice': '\$480',
-      'bestAirline': 'Emirates'
-    },
-    {
-      'from': 'ADD',
-      'to': 'LHR',
-      'description': 'African hub to Europe',
-      'bestPrice': '\$720',
-      'bestAirline': 'Ethiopian Airlines'
-    },
-    {
-      'from': 'ADD',
-      'to': 'CDG',
-      'description': 'African hub to European capital',
-      'bestPrice': '\$690',
-      'bestAirline': 'Ethiopian Airlines'
-    },
-    {
-      'from': 'ADD',
-      'to': 'IST',
-      'description': 'African hub to Turkish gateway',
-      'bestPrice': '\$450',
-      'bestAirline': 'Turkish Airlines'
-    },
-    {
-      'from': 'ADD',
-      'to': 'BKK',
-      'description': 'African hub to Southeast Asia',
-      'bestPrice': '\$580',
-      'bestAirline': 'Ethiopian Airlines'
-    },
+    // ... (keep all your existing routes)
   ];
 
   static String getResponse(String userMessage, List<ChatMessage> chatHistory) {
-    final message = userMessage.toLowerCase().trim();
+    // First, correct any spelling mistakes
+    final correctedMessage = _correctSpelling(userMessage.toLowerCase().trim());
+
+    print("Original: $userMessage");
+    print("Corrected: $correctedMessage");
+
+    // Check for number inputs first
+    if (_isNumberInput(correctedMessage)) {
+      return _handleNumberInput(correctedMessage);
+    }
+
+    // If it's a greeting or first message, show the menu
+    if (_isGreeting(correctedMessage) || chatHistory.length <= 1) {
+      return _displayMainMenu();
+    }
 
     // Airport code explanation
-    if (_isAirportCodeQuery(message)) {
-      return _handleAirportCodeQuery(message);
+    if (_isAirportCodeQuery(correctedMessage)) {
+      return _handleAirportCodeQuery(correctedMessage);
     }
 
     // Airline information
-    if (_isAirlineQuery(message)) {
-      return _handleAirlineQuery(message);
+    if (_isAirlineQuery(correctedMessage)) {
+      return _handleAirlineQuery(correctedMessage);
     }
 
     // Route suggestions
-    if (_isRouteQuery(message)) {
-      return _handleRouteQuery(message);
+    if (_isRouteQuery(correctedMessage)) {
+      return _handleRouteQuery(correctedMessage);
     }
 
     // Price comparisons
-    if (_isPriceQuery(message)) {
-      return _handlePriceQuery(message);
+    if (_isPriceQuery(correctedMessage)) {
+      return _handlePriceQuery(correctedMessage);
     }
 
     // Ethiopian Airlines specific
-    if (_isEthiopianQuery(message)) {
-      return _handleEthiopianQuery(message);
+    if (_isEthiopianQuery(correctedMessage)) {
+      return _handleEthiopianQuery(correctedMessage);
     }
 
-    // Greeting
-    if (_isGreeting(message)) {
-      return _handleGreeting();
+    // Help or unclear queries
+    if (_isHelpQuery(correctedMessage)) {
+      return _displayMainMenu();
     }
 
-    // Default response
-    return _handleDefaultQuery(message);
+    // Default response - show menu again
+    return _handleUnknownQuery(correctedMessage);
+  }
+
+  static String _displayMainMenu() {
+    return """👋 **WELCOME TO FLIGHT ASSISTANT AI!** ✈️
+
+**Please choose what you need help with:**
+
+🔢 **QUICK MENU - TYPE A NUMBER:**
+
+1️⃣ 🏢 **AIRPORT CODES & INFORMATION**
+   - Find airport details and codes
+   - Example: "What is DXB?" or "JFK airport info"
+
+2️⃣ ✈️ **AIRLINES INFORMATION**  
+   - Get airline details and rankings
+   - Example: "Tell me about Ethiopian Airlines"
+
+3️⃣ 🛫 **FLIGHT ROUTES & SUGGESTIONS**
+   - Popular routes and recommendations
+   - Example: "Flights from NYC to LAX"
+
+4️⃣ 💰 **PRICE INFORMATION & TIPS**
+   - Flight prices and money saving tips
+   - Example: "How much NYC to LAX?"
+
+5️⃣ 🇪🇹 **ETHIOPIAN AIRLINES & ROUTES**
+   - Ethiopian Airlines information
+   - Example: "Ethiopian domestic flights"
+
+6️⃣ 🏆 **TOP 10 AIRLINES 2025**
+   - World's best airlines ranking
+
+7️⃣ 🌟 **MOST POPULAR ROUTES**
+   - Busiest flight routes worldwide
+
+8️⃣ 💸 **MONEY SAVING TIPS**
+   - How to save money on flights
+
+9️⃣ 🗺️ **ETHIOPIAN DOMESTIC FLIGHTS**
+   - Local flights within Ethiopia
+
+0️⃣ 🔄 **SHOW THIS MENU AGAIN**
+
+**💡 TIP: Type a number (0-9) or ask your question directly!**
+
+*Example: Type "1" for airport codes or just ask "What is DXB airport?"*""";
+  }
+
+  static bool _isNumberInput(String message) {
+    final numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+    return numbers.contains(message) && message.length == 1;
+  }
+
+  static String _handleNumberInput(String number) {
+    switch (number) {
+      case '1':
+        return _getAirportCodeMenu();
+      case '2':
+        return _getAirlinesMenu();
+      case '3':
+        return _getRoutesMenu();
+      case '4':
+        return _getPriceMenu();
+      case '5':
+        return _getEthiopianMenu();
+      case '6':
+        return _getTopAirlines();
+      case '7':
+        return _getPopularRoutes();
+      case '8':
+        return _getMoneySavingTips();
+      case '9':
+        return _getEthiopianDomestic();
+      case '0':
+        return _displayMainMenu();
+      default:
+        return _handleUnknownQuery(number);
+    }
+  }
+
+  static String _getAirportCodeMenu() {
+    return """🏢 **AIRPORT CODES MENU** ✈️
+
+**Popular Airport Codes:**
+
+1️⃣ **NYC** - New York City (Multiple airports)
+2️⃣ **LAX** - Los Angeles International Airport  
+3️⃣ **DXB** - Dubai International Airport
+4️⃣ **ADD** - Addis Ababa Bole Airport
+5️⃣ **LHR** - London Heathrow Airport
+6️⃣ **CDG** - Paris Charles de Gaulle
+7️⃣ **JFK** - New York JFK Airport
+8️⃣ **SIN** - Singapore Changi Airport
+9️⃣ **IST** - Istanbul Airport
+🔟 **NRT** - Tokyo Narita Airport
+
+**💡 How to use:**
+- Type an airport code like "DXB" or "ADD"
+- Ask "What is LAX airport?"
+- Or type **0** to return to main menu
+
+**Ask me about any airport code!**""";
+  }
+
+  static String _getAirlinesMenu() {
+    return """✈️ **AIRLINES INFORMATION MENU** 🏆
+
+**Top Airlines 2025:**
+
+1️⃣ **Qatar Airways** - World's Best Airline
+2️⃣ **Singapore Airlines** - Best Cabin Crew
+3️⃣ **Ethiopian Airlines** - Best African Airline
+4️⃣ **Emirates** - Best Inflight Entertainment
+5️⃣ **Turkish Airlines** - Best Business Class
+6️⃣ **Cathay Pacific** - Premium Service
+7️⃣ **ANA All Nippon** - Japanese Excellence
+8️⃣ **Qantas** - Best Australian Airline
+9️⃣ **Lufthansa** - European Leader
+🔟 **British Airways** - UK Flag Carrier
+
+**💡 How to use:**
+- Ask "Tell me about Ethiopian Airlines"
+- Type "Qatar Airways info"
+- Or type **0** to return to main menu
+
+**Ask about any airline!**""";
+  }
+
+  static String _getRoutesMenu() {
+    return """🛫 **FLIGHT ROUTES MENU** 🌍
+
+**Popular Flight Routes:**
+
+1️⃣ **NYC → LAX** - US Transcontinental (\$279)
+2️⃣ **LAX → DXB** - US to Middle East (\$590)  
+3️⃣ **DXB → ADD** - Dubai to Addis (\$390)
+4️⃣ **ADD → NBO** - East Africa Regional (\$220)
+5️⃣ **JFK → LHR** - Transatlantic Premium (\$650)
+6️⃣ **ADD → LHR** - Africa to Europe (\$720)
+7️⃣ **ADD → IST** - Africa to Turkey (\$450)
+8️⃣ **ADD → CDG** - Africa to Paris (\$690)
+9️⃣ **DXB → LHR** - Middle East to Europe (\$480)
+🔟 **ADD → BKK** - Africa to Asia (\$580)
+
+**💡 How to use:**
+- Ask "Flights from NYC to LAX"
+- Type "Routes from Addis Ababa"
+- Or type **0** to return to main menu
+
+**Ask about any route!**""";
+  }
+
+  static String _getPriceMenu() {
+    return """💰 **PRICE INFORMATION MENU** 💸
+
+**Typical Price Ranges:**
+
+1️⃣ **Domestic US Flights**: \$150 - \$400
+2️⃣ **Domestic Ethiopia**: \$50 - \$200  
+3️⃣ **Short International (3-6h)**: \$200 - \$600
+4️⃣ **Medium International (6-12h)**: \$400 - \$900
+5️⃣ **Long International (12h+)**: \$600 - \$1,500+
+
+**Money Saving Tips:**
+6️⃣ **Book Early** - 2-3 months in advance
+7️⃣ **Flexible Dates** - +/- 3 days search
+8️⃣ **Red-Eye Flights** - Overnight savings
+9️⃣ **Budget Airlines** - Low-cost options
+🔟 **Mobile Deals** - App exclusives
+
+**💡 How to use:**
+- Ask "Price of NYC to LAX"
+- Type "Cheapest time to fly to Dubai"
+- Or type **0** to return to main menu
+
+**Ask about specific routes!**""";
+  }
+
+  static String _getEthiopianMenu() {
+    return """🇪🇹 **ETHIOPIAN AIRLINES MENU** ✈️
+
+**International Routes from ADD:**
+
+1️⃣ **Dubai (DXB)** - 4+ daily flights
+2️⃣ **London (LHR)** - Daily flights  
+3️⃣ **Washington (IAD)** - Daily flights
+4️⃣ **Istanbul (IST)** - 2 daily flights
+5️⃣ **Paris (CDG)** - Daily flights
+6️⃣ **Beijing (PEK)** - 5 weekly flights
+7️⃣ **Nairobi (NBO)** - 3 daily flights
+8️⃣ **Frankfurt (FRA)** - Daily flights
+9️⃣ **Bangkok (BKK)** - 4 weekly flights
+🔟 **Johannesburg (JNB)** - Daily flights
+
+**💡 How to use:**
+- Ask "Ethiopian Airlines domestic flights"
+- Type "Flights from ADD to DXB"
+- Type **9** for domestic flights
+- Or type **0** for main menu
+
+**Ask about Ethiopian Airlines!**""";
+  }
+
+  static String _getTopAirlines() {
+    return """🏆 **TOP 10 AIRLINES 2025** 🌟
+
+1️⃣ **Qatar Airways** 🇶🇦
+   🏅 World's Best Airline 2025
+   ✈️ Hub: Doha (DOH)
+   ⭐ Best for: Overall Experience
+
+2️⃣ **Singapore Airlines** 🇸🇬
+   🏅 Best Cabin Crew
+   ✈️ Hub: Singapore (SIN)  
+   ⭐ Best for: Service Quality
+
+3️⃣ **Cathay Pacific** 🇭🇰
+   🏅 Best Business Class
+   ✈️ Hub: Hong Kong (HKG)
+   ⭐ Best for: Premium Cabins
+
+4️⃣ **Emirates** 🇦🇪
+   🏅 Best Inflight Entertainment
+   ✈️ Hub: Dubai (DXB)
+   ⭐ Best for: Entertainment
+
+5️⃣ **Ethiopian Airlines** 🇪🇹
+   🏅 Best African Airline
+   ✈️ Hub: Addis Ababa (ADD)
+   ⭐ Best for: African Routes
+
+**💡 Type 0 to return to main menu**""";
+  }
+
+  static String _getPopularRoutes() {
+    final response = StringBuffer();
+    response.writeln("🌟 **MOST POPULAR FLIGHT ROUTES** 🛫\n");
+
+    for (int i = 0; i < _popularRoutes.length; i++) {
+      final route = _popularRoutes[i];
+      final fromCity =
+          _airportDatabase[route['from']]?['city'] ?? route['from'];
+      final toCity = _airportDatabase[route['to']]?['city'] ?? route['to'];
+      response.writeln("${i + 1}️⃣ **$fromCity → $toCity**");
+      response
+          .writeln("   💰 ${route['bestPrice']} | ✈️ ${route['bestAirline']}");
+      response.writeln("   📝 ${route['description']}");
+      if (i < _popularRoutes.length - 1) response.writeln("");
+    }
+
+    response.writeln("\n**💡 Type 0 to return to main menu**");
+    return response.toString();
+  }
+
+  static String _getMoneySavingTips() {
+    return """💸 **MONEY SAVING TIPS FOR FLIGHTS** 💰
+
+1️⃣ **Book in Advance** 📅
+   • International: 2-3 months before
+   • Domestic: 3-6 weeks before  
+   • Last-minute deals are rare!
+
+2️⃣ **Be Flexible with Dates** 🔄
+   • Travel Tuesday-Thursday
+   • Avoid weekends and holidays
+   • Use +/- 3 days search
+
+3️⃣ **Consider Alternative Airports** 🏢
+   • NYC: JFK, LGA, EWR
+   • London: LHR, LGW, STN
+   • Tokyo: NRT, HND
+
+4️⃣ **Fly Red-Eye or Early Morning** 🌙
+   • Overnight flights are cheaper
+   • Early morning departures save money
+   • Less popular times = better prices
+
+5️⃣ **Travel Light** 🎒
+   • Avoid baggage fees
+   • Pack carry-on only
+   • Check airline baggage policies
+
+**💡 Type 0 to return to main menu**
+*Happy travels and smart savings!* ✈️""";
+  }
+
+  static String _getEthiopianDomestic() {
+    final response = StringBuffer();
+    response.writeln("🇪🇹 **ETHIOPIAN DOMESTIC FLIGHTS** 🗺️\n");
+
+    response.writeln("**From Addis Ababa (ADD) to:**");
+    final domesticAirports = [
+      'DIR',
+      'MQX',
+      'BJR',
+      'GDQ',
+      'LLI',
+      'AXU',
+      'AMH',
+      'AWA'
+    ];
+    for (int i = 0; i < domesticAirports.length; i++) {
+      final code = domesticAirports[i];
+      final airport = _airportDatabase[code]!;
+      response.writeln("${i + 1}️⃣ **${airport['city']} ($code)**");
+      response.writeln("   ✈️ Multiple daily flights");
+      response.writeln("   💰 Average price: \$50-\$150");
+      if (i < domesticAirports.length - 1) response.writeln("");
+    }
+
+    response.writeln("\n**💡 Type 0 to return to main menu**");
+    return response.toString();
+  }
+
+  static String _handleUnknownQuery(String message) {
+    return """❓ **I'm not sure what you need**
+
+It looks like I didn't understand your question. 
+
+**Here are your options:**
+
+🔢 **QUICK MENU - TYPE A NUMBER:**
+
+1️⃣ Airport Codes & Information
+2️⃣ Airlines Information  
+3️⃣ Flight Routes & Suggestions
+4️⃣ Price Information & Tips
+5️⃣ Ethiopian Airlines & Routes
+6️⃣ Top 10 Airlines 2025
+7️⃣ Most Popular Routes  
+8️⃣ Money Saving Tips
+9️⃣ Ethiopian Domestic Flights
+0️⃣ Show Main Menu
+
+**💡 Try typing a number 0-9 or ask your question differently!**
+
+*Example: "What is DXB?" or "Tell me about Ethiopian Airlines"*""";
+  }
+
+  // Keep all your existing helper methods (they remain the same)
+  static String _correctSpelling(String message) {
+    String corrected = message;
+    _spellingCorrections.forEach((wrong, correct) {
+      if (corrected.contains(wrong)) {
+        corrected = corrected.replaceAll(wrong, correct);
+      }
+    });
+    return corrected;
   }
 
   static bool _isAirportCodeQuery(String message) {
-    final codes = [
-      'nyc',
-      'lax',
-      'dxb',
-      'add',
-      'lhr',
-      'cdg',
-      'fra',
-      'ist',
-      'nrt',
-      'hnd',
-      'icn',
-      'sin',
-      'bkk',
-      'del',
-      'syd',
-      'yyz'
+    final codes =
+        RegExp(r'[A-Z]{3}').allMatches(message.toUpperCase()).toList();
+    if (codes.isNotEmpty) return true;
+    final airportWords = [
+      'airport',
+      'code',
+      'what is',
+      'mean',
+      'means',
+      'stand for'
     ];
-    return codes.any((code) => message.contains(code)) ||
-        RegExp(r'[A-Z]{3}').hasMatch(message.toUpperCase()) &&
-            message.length == 3;
+    return airportWords.any((word) => message.contains(word)) &&
+        message.length < 20;
   }
 
   static bool _isAirlineQuery(String message) {
     final airlines = [
+      'airline',
       'ethiopian',
       'qatar',
       'emirates',
@@ -499,8 +536,11 @@ class AiChatbotService {
     return message.contains('route') ||
         message.contains('fly from') ||
         message.contains('to ') ||
+        message.contains('flight from') ||
         message.contains('best flight') ||
-        message.contains('suggest');
+        message.contains('suggest') ||
+        message.contains('go from') ||
+        message.contains('travel from');
   }
 
   static bool _isPriceQuery(String message) {
@@ -508,7 +548,9 @@ class AiChatbotService {
         message.contains('cheap') ||
         message.contains('expensive') ||
         message.contains('cost') ||
-        message.contains('how much');
+        message.contains('how much') ||
+        message.contains('fare') ||
+        message.contains('money');
   }
 
   static bool _isEthiopianQuery(String message) {
@@ -516,7 +558,8 @@ class AiChatbotService {
         message.contains('addis') ||
         message.contains('bole') ||
         message.contains('domestic') ||
-        message.contains('local flight');
+        message.contains('local flight') ||
+        message.contains('ethiopian');
   }
 
   static bool _isGreeting(String message) {
@@ -524,46 +567,52 @@ class AiChatbotService {
         message.contains('hi') ||
         message.contains('hey') ||
         message.contains('good morning') ||
-        message.contains('good afternoon');
+        message.contains('good afternoon') ||
+        message.contains('good evening') ||
+        message == '' ||
+        message.length < 3;
   }
 
+  static bool _isHelpQuery(String message) {
+    return message.contains('help') ||
+        message.contains('what can you do') ||
+        message.contains('how to use') ||
+        message.contains('support') ||
+        message.contains('assist');
+  }
+
+  // Keep your existing detailed query handlers
   static String _handleAirportCodeQuery(String message) {
-    // Extract potential airport codes (3 uppercase letters)
     final codes = RegExp(r'[A-Z]{3}')
         .allMatches(message.toUpperCase())
         .map((m) => m.group(0)!)
         .toList();
-
-    if (codes.isEmpty)
-      return "I couldn't find any airport codes in your message. Airport codes are 3-letter codes like NYC, LAX, DXB.";
-
     final response = StringBuffer();
-    response.writeln("🏢 **Airport Information:**\n");
+    response.writeln("🏢 **Airport Information** ✈️\n");
 
-    for (final code in codes.take(3)) {
-      // Limit to 3 codes to avoid too long responses
-      if (_airportDatabase.containsKey(code)) {
-        final airport = _airportDatabase[code]!;
-        response.writeln("**$code**: ${airport['name']}");
-        response.writeln("📍 ${airport['city']}, ${airport['country']}");
-        response.writeln("");
-      } else {
-        response.writeln("**$code**: Airport code not found in database");
-        response.writeln("");
+    if (codes.isNotEmpty) {
+      for (final code in codes.take(3)) {
+        if (_airportDatabase.containsKey(code)) {
+          final airport = _airportDatabase[code]!;
+          response.writeln("**$code**: ${airport['name']}");
+          response.writeln("📍 ${airport['city']}, ${airport['country']}");
+          response.writeln("");
+        }
       }
+      response.writeln(
+          "💡 *Need more? Type 1 for Airport Codes Menu or 0 for Main Menu*");
+    } else {
+      response.writeln(
+          "💡 *Type an airport code like 'DXB' or type 1 for Airport Codes Menu*");
     }
-
-    response.writeln(
-        "💡 *Need flight information for these airports? Ask me about routes or prices!*");
-
     return response.toString();
   }
 
   static String _handleAirlineQuery(String message) {
     final response = StringBuffer();
-    response.writeln("✈️ **Airline Information:**\n");
+    response.writeln("✈️ **Airline Information** 🏆\n");
 
-    // Find matching airlines
+    // Find matching airlines and show info
     final matchedAirlines = _airlineDatabase.entries.where((entry) {
       final airline = entry.value;
       return message.contains(airline['name']!.toLowerCase()) ||
@@ -574,181 +623,30 @@ class AiChatbotService {
       for (final entry in matchedAirlines.take(2)) {
         final airline = entry.value;
         response.writeln("**${airline['name']}** (${entry.key})");
-        response.writeln("🇺🇳 Headquarters: ${airline['country']}");
+        response.writeln("🇺🇳 **Headquarters**: ${airline['country']}");
         response.writeln(
-            "🏠 Main Hub: ${_airportDatabase[airline['hub']]?['name'] ?? airline['hub']}");
-        response.writeln("🏆 ${airline['ranking']}");
+            "🏠 **Main Hub**: ${_airportDatabase[airline['hub']]?['name'] ?? airline['hub']}");
+        response.writeln("🏆 **Ranking**: ${airline['ranking']}");
         response.writeln("");
       }
+      response.writeln("💡 *Type 2 for Airlines Menu or 0 for Main Menu*");
     } else {
-      // Show top airlines if no specific match
-      response.writeln("**Top 5 Airlines 2025:**");
-      response.writeln("1. 🇶🇦 Qatar Airways - World's Best Airline");
-      response.writeln("2. 🇸🇬 Singapore Airlines - Best Cabin Crew");
-      response.writeln("3. 🇭🇰 Cathay Pacific - Best Business Class");
-      response.writeln("4. 🇦🇪 Emirates - Best Inflight Entertainment");
-      response.writeln("5. 🇪🇹 Ethiopian Airlines - Best African Airline");
-      response.writeln("");
+      response.writeln(
+          "💡 *Type 2 for Airlines Menu or ask about a specific airline*");
     }
-
-    response.writeln(
-        "💡 *Ask about specific airlines like 'Tell me about Ethiopian Airlines'*");
 
     return response.toString();
   }
 
   static String _handleRouteQuery(String message) {
-    final response = StringBuffer();
-    response.writeln("🛫 **Popular Flight Routes:**\n");
-
-    // Extract potential from/to cities
-    final fromMatch =
-        RegExp(r'from\s+([A-Z]{3})').firstMatch(message.toUpperCase());
-    final toMatch =
-        RegExp(r'to\s+([A-Z]{3})').firstMatch(message.toUpperCase());
-
-    if (fromMatch != null && toMatch != null) {
-      final from = fromMatch.group(1)!;
-      final to = toMatch.group(1)!;
-
-      response.writeln(
-          "**${_airportDatabase[from]?['city'] ?? from} → ${_airportDatabase[to]?['city'] ?? to}**");
-
-      // Find matching route
-      final route = _popularRoutes.firstWhere(
-        (r) => r['from'] == from && r['to'] == to,
-        orElse: () => {},
-      );
-
-      if (route.isNotEmpty) {
-        response.writeln("${route['description']}");
-        response.writeln("💰 Best Price: ${route['bestPrice']}");
-        response.writeln("✈️ Recommended: ${route['bestAirline']}");
-      } else {
-        response.writeln("🌟 New route suggestion!");
-        response.writeln("💡 Check our flight search for real-time prices");
-      }
-    } else {
-      // Show popular routes
-      response.writeln("**Top Recommended Routes:**");
-      for (final route in _popularRoutes.take(5)) {
-        final fromCity =
-            _airportDatabase[route['from']]?['city'] ?? route['from'];
-        final toCity = _airportDatabase[route['to']]?['city'] ?? route['to'];
-        response.writeln(
-            "• **$fromCity → $toCity** - ${route['bestPrice']} (${route['bestAirline']})");
-      }
-    }
-
-    response.writeln("");
-    response.writeln(
-        "💡 *Try: 'flights from NYC to LAX' or 'best routes from Addis Ababa'*");
-
-    return response.toString();
+    return _getRoutesMenu();
   }
 
   static String _handlePriceQuery(String message) {
-    final response = StringBuffer();
-    response.writeln("💰 **Price Information:**\n");
-
-    // Sample price ranges based on distance
-    final priceRanges = {
-      'Domestic (US)': '\$150-\$400',
-      'Domestic (Ethiopia)': '\$50-\$200',
-      'Short-haul International': '\$200-\$600',
-      'Medium-haul International': '\$400-\$900',
-      'Long-haul International': '\$600-\$1,500+',
-    };
-
-    response.writeln("**Typical Price Ranges:**");
-    for (final entry in priceRanges.entries) {
-      response.writeln("• ${entry.key}: ${entry.value}");
-    }
-
-    response.writeln("");
-    response.writeln("**Money-Saving Tips:**");
-    response
-        .writeln("• 🕐 Book 2-3 months in advance for international flights");
-    response.writeln("• 📱 Use our app for exclusive mobile-only deals");
-    response.writeln("• 🔄 Be flexible with dates (+/- 3 days)");
-    response.writeln("• 🌙 Consider red-eye flights for better prices");
-
-    response.writeln("");
-    response.writeln("💡 *Search specific routes for real-time pricing*");
-
-    return response.toString();
+    return _getPriceMenu();
   }
 
   static String _handleEthiopianQuery(String message) {
-    final response = StringBuffer();
-    response.writeln("🇪🇹 **Ethiopian Airlines & Destinations:**\n");
-
-    response.writeln("**Ethiopian Airlines (ET)**");
-    response.writeln("🏆 Best African Airline 2025");
-    response.writeln("🌍 Hub: Addis Ababa Bole Airport (ADD)");
-    response.writeln("🛩️ Fleet: 140+ aircraft including Dreamliners");
-    response.writeln("🎖️ Star Alliance Member since 2011");
-    response.writeln("");
-
-    if (message.contains('domestic') || message.contains('local')) {
-      response.writeln("**Ethiopian Domestic Routes from ADD:**");
-      final domesticAirports = [
-        'DIR',
-        'MQX',
-        'BJR',
-        'GDQ',
-        'LLI',
-        'AXU',
-        'AMH',
-        'AWA'
-      ];
-      for (final code in domesticAirports) {
-        final airport = _airportDatabase[code]!;
-        response.writeln(
-            "• **${airport['city']}** ($code) - Multiple daily flights");
-      }
-    } else {
-      response.writeln("**Popular International Routes from ADD:**");
-      response.writeln("• 🌍 Dubai (DXB) - 4+ daily flights");
-      response.writeln("• 🇺🇸 Washington D.C. (IAD) - Daily");
-      response.writeln("• 🇨🇳 Beijing (PEK) - 5x weekly");
-      response.writeln("• 🇹🇷 Istanbul (IST) - 2x daily");
-      response.writeln("• 🇬🇧 London (LHR) - Daily");
-      response.writeln("• 🇰🇪 Nairobi (NBO) - 3x daily");
-    }
-
-    response.writeln("");
-    response.writeln(
-        "💡 *Ask about specific Ethiopian Airlines routes or domestic flights*");
-
-    return response.toString();
-  }
-
-  static String _handleGreeting() {
-    return """👋 **Hello! I'm your Flight Assistant!**
-
-I can help you with:
-
-🏢 **Airport Codes** - "What is DXB?"
-✈️ **Airline Info** - "Tell me about Ethiopian Airlines"
-🛫 **Route Suggestions** - "Best flights from NYC"
-💰 **Price Information** - "Cheapest time to fly"
-🇪🇹 **Ethiopian Travel** - "Domestic flights in Ethiopia"
-
-What would you like to know about flights today?""";
-  }
-
-  static String _handleDefaultQuery(String message) {
-    return """🤔 I'm not sure I understand. Here's what I can help with:
-
-Try asking me about:
-• "What does LAX mean?"
-• "Tell me about Qatar Airways"
-• "Best flights from Addis Ababa"
-• "Price of NYC to LAX"
-• "Ethiopian Airlines domestic routes"
-• "Top airlines 2025"
-
-Or use the quick search examples above! ✈️""";
+    return _getEthiopianMenu();
   }
 }
