@@ -1,29 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:flight_availability_app/screens/search_screen.dart';
+
+import 'pages/search_page.dart';
 
 void main() {
-  runApp(const FlightAvailabilityApp());
+  runApp(const FlightApp());
 }
 
-class FlightAvailabilityApp extends StatelessWidget {
-  const FlightAvailabilityApp({super.key});
+class FlightApp extends StatelessWidget {
+  const FlightApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flight Availability',
+      title: 'Flight UI',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        primaryColor: const Color(0xFF1976D2),
-        colorScheme: const ColorScheme.light(
-          primary: Color(0xFF1976D2),
-          secondary: Color(0xFFFF6D00),
-        ),
-        fontFamily: 'Roboto',
+        scaffoldBackgroundColor: Colors.white,
         useMaterial3: true,
       ),
-      home: const SearchScreen(),
-      debugShowCheckedModeBanner: false,
+      home: SearchPage(), 
     );
+    
   }
 }
