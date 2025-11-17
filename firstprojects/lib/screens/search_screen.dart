@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flight_availability_app/screens/results_screen.dart';
+import 'package:flight_availability_app/pages/results_page.dart'; // Fixed import path
 import 'package:flight_availability_app/screens/chatbot_screen.dart';
 import 'package:intl/intl.dart';
 
@@ -15,7 +15,9 @@ class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _originController = TextEditingController();
   final TextEditingController _destinationController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
+  final TextEditingController _passengersController = TextEditingController(text: '1');
   DateTime? _selectedDate;
+  int _passengers = 1;
 
   @override
   void initState() {
@@ -57,13 +59,17 @@ class _SearchScreenState extends State<SearchScreen> {
 
   void _searchFlights() {
     if (_formKey.currentState!.validate()) {
+      // Parse passengers count
+      final passengers = int.tryParse(_passengersController.text) ?? 1;
+      
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ResultsScreen(
-            origin: _originController.text.trim().toUpperCase(),
-            destination: _destinationController.text.trim().toUpperCase(),
+          builder: (context) => ResultsPage( // Fixed class name
+            from: _originController.text.trim().toUpperCase(),
+            to: _destinationController.text.trim().toUpperCase(),
             date: _dateController.text.trim(),
+            passengers: passengers, // Added passengers parameter
           ),
         ),
       );
@@ -143,6 +149,10 @@ class _SearchScreenState extends State<SearchScreen> {
 
                         // Date Field
                         _buildDateField(context),
+                        const SizedBox(height: 20),
+
+                        // Passengers Field
+                        _buildPassengersField(),
                         const SizedBox(height: 30),
 
                         // Search Button
@@ -360,6 +370,74 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
+  Widget _buildPassengersField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Passengers',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey[700],
+            letterSpacing: -0.2,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: TextFormField(
+            controller: _passengersController,
+            keyboardType: TextInputType.number,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            decoration: InputDecoration(
+              hintText: 'Number of passengers',
+              hintStyle: TextStyle(
+                color: Colors.grey[500],
+                fontWeight: FontWeight.w400,
+              ),
+              prefixIcon: Icon(
+                Icons.people_rounded,
+                color: const Color(0xFF1976D2),
+                size: 20,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter number of passengers';
+              }
+              final passengers = int.tryParse(value);
+              if (passengers == null || passengers < 1) {
+                return 'Please enter a valid number (min 1)';
+              }
+              return null;
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildSearchButton() {
     return SizedBox(
       width: double.infinity,
@@ -509,6 +587,7 @@ class _SearchScreenState extends State<SearchScreen> {
     _originController.dispose();
     _destinationController.dispose();
     _dateController.dispose();
+    _passengersController.dispose();
     super.dispose();
   }
 }
