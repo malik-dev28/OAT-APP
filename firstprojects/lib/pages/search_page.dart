@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/input_box.dart';
 import 'results_page.dart';
-import '../screens/chatbot_screen.dart';
+import 'chatbot_page.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
