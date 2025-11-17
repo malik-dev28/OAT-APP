@@ -110,7 +110,6 @@ class _SearchPageState extends State<SearchPage>
                 hint: Text(hint),
                 value: value,
                 items: locations
-                    .take(4)
                     .map(
                       (loc) => DropdownMenuItem(value: loc, child: Text(loc)),
                     )
@@ -128,7 +127,10 @@ class _SearchPageState extends State<SearchPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const Icon(Icons.close, color: Colors.black),
+        leading: IconButton(
+          icon: const Icon(Icons.close, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(
@@ -224,7 +226,7 @@ class _SearchPageState extends State<SearchPage>
                       child: InputBox(
                         icon: Icons.calendar_today,
                         hint: departDate == null
-                            ? "Fri, Jul 14"
+                            ? "Select date"
                             : dateToText(departDate),
                         readOnly: true,
                         onTap: () => pickDate(false),
@@ -235,7 +237,7 @@ class _SearchPageState extends State<SearchPage>
                       child: InputBox(
                         icon: Icons.calendar_today,
                         hint: returnDate == null
-                            ? "Fri, Jul 14"
+                            ? "Select date"
                             : dateToText(returnDate),
                         readOnly: true,
                         onTap: () => pickDate(true),
@@ -267,16 +269,17 @@ class _SearchPageState extends State<SearchPage>
                                 if (travellers > 1) travellers--;
                               });
                             },
-                            icon: const Icon(Icons.remove_circle_outline),
+                            icon: Icon(Icons.remove_circle_outline, 
+                                color: travellers > 1 ? Colors.black : Colors.grey),
                           ),
-                          Text("$travellers"),
+                          Text("$travellers", style: const TextStyle(fontWeight: FontWeight.bold)),
                           IconButton(
                             onPressed: () {
                               setState(() {
                                 travellers++;
                               });
                             },
-                            icon: const Icon(Icons.add_circle_outline),
+                            icon: const Icon(Icons.add_circle_outline, color: Colors.black),
                           ),
                         ],
                       ),
@@ -296,7 +299,7 @@ class _SearchPageState extends State<SearchPage>
                         },
                       ),
                       const SizedBox(width: 6),
-                      const Icon(Icons.keyboard_arrow_down),
+                      const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
                     ],
                   ),
                 ),
@@ -322,6 +325,7 @@ class _SearchPageState extends State<SearchPage>
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text("Please fill all required fields"),
+                            duration: Duration(seconds: 2),
                           ),
                         );
                         return;
@@ -341,7 +345,7 @@ class _SearchPageState extends State<SearchPage>
                     },
                     child: const Text(
                       "Search flights",
-                      style: TextStyle(fontSize: 17),
+                      style: TextStyle(fontSize: 17, color: Colors.white),
                     ),
                   ),
                 ),
@@ -352,13 +356,12 @@ class _SearchPageState extends State<SearchPage>
           // Floating AI Button positioned at middle-right
           Positioned(
             right: 16,
-            top:
-                MediaQuery.of(context).size.height / 2 - 28, // Middle of screen
+            top: MediaQuery.of(context).size.height / 2 - 28,
             child: FloatingActionButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ChatbotScreen()),
+                  MaterialPageRoute(builder: (context) => const ChatbotScreen()),
                 );
               },
               backgroundColor: const Color(0xFF1976D2),
