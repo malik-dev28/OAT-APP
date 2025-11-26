@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'pages/search_page.dart';
+import 'pages/search_screen.dart';
 
 void main() {
   runApp(const FlightApp());
